@@ -1,0 +1,118 @@
+ARCH LINUX UPUTE
+ ------ BASIC INSTALL ------
+
+  > lsblk
+  * provjeri diskove
+
+  > fdisk
+  * particioniranje diska
+  (
+    d - delete
+    n - new
+
+    politika (sve p - primary)
+     - swap: 150% memorije (+4G)
+     - root: 20GB (programi) (+20G)
+     - boot: 200MB (+200M)
+     - home: ostalo
+
+     w - write
+  )
+
+  > mkfs.ext4 /dev/sda1
+   * (boot, root, home)
+  
+  > mkswap /dev/sda2
+  > swapon /dev/sda2
+
+  > mount /dev/sda3 /mnt
+   * mount root particije
+  
+  > mkdir /mnt/home
+  > mkdir /mnt/boot
+
+  > mount /dev/sda1 /mnt/boot
+  > mount /dev/sda4 /mnt/home
+   
+  > pacstrap /mnt base base-devel
+
+  > genfstab -U /mnt > /mnt/etc/fstab
+
+  > arch-chroot /mnt
+  * log into the new system
+
+  > pacman -S networkmanager dialog
+  > systemctl enable NetworkManager
+  * nmtui ("graficki" manager za mrezu)
+
+  > pacman -S grub
+  > grub-install --target=i386-pc /dev/sda
+  > grub-mkconfig -o /boot/grub/grub.cfg
+
+  > passwd
+
+  > vim /et/locale/gen
+  * uncomment en_US oba
+  > locale-gen
+
+  > vi /etc/locale.conf
+    LANG=en_US.UTF-8
+  > ln -sf /usr/share/zoneinfo/Europe/Zagreb /etc/localtime
+
+  > vi /etc/hostname
+   * naziv kompa
+
+  > exit (izlaz iz arch-chroot)
+  > umount -R /mnt
+
+  
+ 
+  ------ XORG AND STUFF ------
+
+  > vi etc/vconsole.conf
+    * 	KEYMAP=croat
+		FONT=
+		FONT_MAP=
+  
+  > useradd -m -g wheel marko
+  > passwd marko
+  > visudo
+
+
+  > pacman -S xorg-server xorg-xinit xterm (virtualbox-guest-utils ako treba za vbox)
+
+  > vi /etc/X11/Xwrapper.config
+    *
+    allowed_users=anybody
+	needs_root_rights=yes  
+
+  > pacman -S i3-gaps i3status rxvt-unicode dmenu
+  > pacman -S noto-fonts
+  > pacman -S feh
+  > vi .xinitrc
+  *
+    exec i3
+    feh --bg-scale /pathto/image.jpg
+
+  > pacman -S lightdm lightdm-gtk-greeter
+  > sudo systemctl enable lightdm.service
+  > localectl --no-convert set-x11-keymap hr,us pc104 
+  	* dodaj hrvatski keymap na xorg
+  
+  * download consolas arch font
+
+  --- STYLING ---
+  
+  > sudo pacman lightdm-gtk-greeter-settings
+
+
+  --- MAIL ---
+
+  > 
+
+  --- PRINTER SETUP ---
+
+  > sudo pacman -S cups
+  > sudo pacman -S hplip
+  > sudo pacman -S system-config-printer
+  > sudo systemctl enable org.cups.cupsd.service
